@@ -1,3 +1,5 @@
+use ethers_core::rand::rngs::ThreadRng;
+
 use ethers::prelude::*;
 use ethers_core::rand::thread_rng;
 
@@ -9,10 +11,12 @@ async fn main() {
     // create multicall instance
     let mut multicall = Multicall::new(provider, None).await.unwrap();
 
-    // create wallets with ethers
-    let wallet = LocalWallet::new(&mut thread_rng());
+    let mut rng = thread_rng();
 
-    let wallet2 = LocalWallet::new(&mut thread_rng());
+    // create wallets with ethers
+    let wallet = generate_wallet(&mut rng);
+
+    let wallet2 = generate_wallet(&mut rng);
 
     let result: (U256, U256) = multicall
         .clear_calls()
@@ -23,4 +27,8 @@ async fn main() {
         .unwrap();
 
     println!("Balance: {:?}", result);
+}
+
+fn generate_wallet(rng: &mut ThreadRng) -> LocalWallet {
+    LocalWallet::new(rng)
 }
